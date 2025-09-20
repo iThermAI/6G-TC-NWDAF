@@ -1,0 +1,9 @@
+docker
+pymongo
+fastapi
+requests
+pydantic
+pingparsing
+python-multipart
+uvicorn[standard]
+prometheus_client

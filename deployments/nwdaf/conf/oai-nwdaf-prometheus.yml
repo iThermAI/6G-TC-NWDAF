@@ -1,0 +1,6 @@
+scrape_configs:
+  - job_name: 'oai-analytics'
+    metrics_path: '/metrics'
+    scrape_timeout: 30s
+    static_configs:
+      - targets: ['oai-nwdaf-nbi-events-handler:8080']

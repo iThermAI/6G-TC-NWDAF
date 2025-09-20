@@ -1,0 +1,12 @@
+{
+  "event-id": "NETWORK_PERFORMANCE",
+  "ana-req": {
+    "startTs": "",
+    "endTs": ""
+  },
+  "event-filter": {
+    "nwPerfTypes": ["NUM_OF_UE"]
+  },
+  "supported-features": {},
+  "tgt-ue": {}
+}

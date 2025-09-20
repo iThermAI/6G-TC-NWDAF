@@ -1,0 +1,189 @@
+services:
+    oai-flexric:
+        image: ithermai6gtc/oai-flexric:v1
+        container_name: oai-flexric
+        networks:
+            ric_net:
+                ipv4_address: ${FLEXRIC_RIC_IP:-192.168.75.2}
+        volumes:
+            - ./conf/flexric.conf:/usr/local/etc/flexric/flexric.conf
+        healthcheck:
+            test: /bin/bash -c "pgrep nearRT-RIC"
+            interval: 10s
+            timeout: 5s
+    oai-gnb1:
+        image: ithermai6gtc/oai-gnb:v1
+        privileged: true
+        container_name: rfsim5g-oai-gnb1
+        environment:
+            ASAN_OPTIONS: detect_leaks=0
+        command: [
+            "./nr-softmodem", "--rfsim", "--sa", "--gNBs.[0].min_rxtxtime", "5",
+            "-O", "/oai/ran/config/gnb.sa.band78.106prb.rfsim.conf"
+        ]
+        depends_on:
+            - oai-flexric
+        networks:
+            ric_net:
+                ipv4_address: ${GNB1_RIC_IP:-192.168.75.9}
+            ue_net:
+                ipv4_address: ${GNB1_UENET_IP:-192.168.78.11}
+            public_net:
+                ipv4_address: ${GNB1_PUBLICNET_IP:-192.168.70.151}
+        volumes:
+            - ./conf/gnb1-e2.conf:/oai/ran/config/gnb.sa.band78.106prb.rfsim.conf
+        healthcheck:
+            test: /bin/bash -c "pgrep nr-softmodem"
+            interval: 10s
+            timeout: 5s
+            retries: 5
+    oai-gnb2:
+        image: ithermai6gtc/oai-gnb:v1
+        privileged: true
+        container_name: rfsim5g-oai-gnb2
+        environment:
+            ASAN_OPTIONS: detect_leaks=0
+        command: [
+            "./nr-softmodem", "--rfsim", "--sa", "--gNBs.[0].min_rxtxtime", "5",
+            "-O", "/oai/ran/config/gnb.sa.band78.106prb.rfsim.conf"
+        ]
+        depends_on:
+            - oai-flexric
+        networks:
+            ric_net:
+                ipv4_address: ${GNB2_RIC_IP:-192.168.75.8}
+            ue_net:
+                ipv4_address: ${GNB2_UENET_IP:-192.168.78.12}
+            public_net:
+                ipv4_address: ${GNB2_PUBLICNET_IP:-192.168.70.152}
+        volumes:
+            - ./conf/gnb2-e2.conf:/oai/ran/config/gnb.sa.band78.106prb.rfsim.conf
+        healthcheck:
+            test: /bin/bash -c "pgrep nr-softmodem"
+            interval: 10s
+            timeout: 5s
+            retries: 5
+    oai-gnb3:
+        image: ithermai6gtc/oai-gnb:v1
+        privileged: true
+        container_name: rfsim5g-oai-gnb3
+        environment:
+            ASAN_OPTIONS: detect_leaks=0
+        command: [
+            "./nr-softmodem", "--rfsim", "--sa", "--gNBs.[0].min_rxtxtime", "5",
+            "-O", "/oai/ran/config/gnb.sa.band78.106prb.rfsim.conf"
+        ]
+        depends_on:
+            - oai-flexric
+        networks:
+            ric_net:
+                ipv4_address: ${GNB3_RIC_IP:-192.168.75.7}
+            ue_net:
+                ipv4_address: ${GNB3_UENET_IP:-192.168.78.13}
+            public_net:
+                ipv4_address: ${GNB3_PUBLICNET_IP:-192.168.70.153}
+        volumes:
+            - ./conf/gnb3-e2.conf:/oai/ran/config/gnb.sa.band78.106prb.rfsim.conf
+        healthcheck:
+            test: /bin/bash -c "pgrep nr-softmodem"
+            interval: 10s
+            timeout: 5s
+            retries: 5
+    oai-nr-ue1:
+        image: ithermai6gtc/oai-nr-ue:v1
+        privileged: true
+        container_name: rfsim5g-oai-nr-ue1
+        environment:
+            ASAN_OPTIONS: detect_leaks=0
+        command: [
+            "./nr-uesoftmodem", "--rfsim", "-r", "106", "--numerology", "1", "-C", "3619200000",
+            "--band", "78", "--uicc0.imsi", "001010000000001", "--uicc0.nssai_sst", "1",
+            "--rfsimulator.serveraddr", "192.168.78.11", "-O", "/oai/ran/config/nr-ue.conf"
+        ]
+        depends_on:
+            - oai-gnb1
+        networks:
+            ue_net:
+                ipv4_address: ${UE1_UENET_IP:-192.168.78.8}
+        volumes:
+            - ./conf/ue.conf:/oai/ran/config/nr-ue.conf
+            - ./conf/channelmod_rfsimu.conf:/oai/ran/config/channelmod_rfsimu.conf
+        healthcheck:
+            test: /bin/bash -c "pgrep nr-uesoftmodem"
+            interval: 10s
+            timeout: 5s
+            retries: 5
+    oai-nr-ue2:
+        image: ithermai6gtc/oai-nr-ue:v1
+        privileged: true
+        container_name: rfsim5g-oai-nr-ue2
+        environment:
+            ASAN_OPTIONS: detect_leaks=0
+        command: [
+            "./nr-uesoftmodem", "--rfsim", "-r", "106", "--numerology", "1", "-C", "3619200000",
+            "--band", "78", "--uicc0.imsi", "001010000000002", "--uicc0.nssai_sst", "128",
+            "--uicc0.nssai_sd", "0x000080", "--rfsimulator.serveraddr", "192.168.78.12",
+            "--uicc0.dnn", "oai", "-O", "/oai/ran/config/nr-ue.conf"
+        ]
+        depends_on:
+            - oai-gnb2
+        networks:
+            ue_net:
+                ipv4_address: ${UE2_UENET_IP:-192.168.78.9}
+        volumes:
+            - ./conf/ue.conf:/oai/ran/config/nr-ue.conf
+            - ./conf/channelmod_rfsimu.conf:/oai/ran/config/channelmod_rfsimu.conf
+        healthcheck:
+            test: /bin/bash -c "pgrep nr-uesoftmodem"
+            interval: 10s
+            timeout: 5s
+            retries: 5
+    oai-nr-ue3:
+        image: ithermai6gtc/oai-nr-ue:v1
+        privileged: true
+        container_name: rfsim5g-oai-nr-ue3
+        environment:
+            ASAN_OPTIONS: detect_leaks=0
+        command: [
+            "./nr-uesoftmodem", "--rfsim", "-r", "106", "--numerology", "1", "-C", "3619200000",
+            "--band", "78", "--uicc0.imsi", "001010000000003", "--uicc0.nssai_sst", "5",
+            "--uicc0.nssai_sd", "0x000082", "--rfsimulator.serveraddr", "192.168.78.13",
+            "--uicc0.dnn", "oai", "-O", "/oai/ran/config/nr-ue.conf"
+        ]
+        depends_on:
+            - oai-gnb3
+        networks:
+            ue_net:
+                ipv4_address: ${UE3_UENET_IP:-192.168.78.10}
+        volumes:
+            - ./conf/ue.conf:/oai/ran/config/nr-ue.conf
+            - ./conf/channelmod_rfsimu.conf:/oai/ran/config/channelmod_rfsimu.conf
+        healthcheck:
+            test: /bin/bash -c "pgrep nr-uesoftmodem"
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+networks:
+    ric_net:
+        driver: bridge
+        name: rfsim5g-oai-ric-net
+        ipam:
+            config:
+                - subnet: ${RIC_NET_SUBNET:-192.168.75.0/26}
+        driver_opts:
+            com.docker.network.bridge.name: "rfsim5g-ric"
+    public_net:
+        external:
+            name: demo-oai-public-net
+    ue_net:
+        driver: bridge
+        name: rfsim5g-oai-ue-net
+        ipam:
+            config:
+                - subnet: ${UE_NET_SUBNET:-192.168.78.0/28}
+        driver_opts:
+            com.docker.network.bridge.name: "rfsim5g-ue"
+    public_net_access:
+        external:
+            name: oai-public-access
