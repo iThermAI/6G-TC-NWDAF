@@ -114,8 +114,6 @@ amf:
       nssai:
         - sst: 1
           sd: 000001 # in hex
-        - sst: 1
-          sd: 000005 # in hex
         - sst: 128
           sd: 000080 # in hex
         - sst: 5

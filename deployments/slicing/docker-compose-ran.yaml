@@ -12,7 +12,7 @@ services:
             interval: 10s
             timeout: 5s
     oai-gnb1:
-        image: ithermai6gtc/oai-gnb:v1
+        image: ithermai6gtc/oai-gnb-develop:latest
         privileged: true
         container_name: rfsim5g-oai-gnb1
         environment:
@@ -38,7 +38,7 @@ services:
             timeout: 5s
             retries: 5
     oai-gnb2:
-        image: ithermai6gtc/oai-gnb:v1
+        image: ithermai6gtc/oai-gnb-develop:latest
         privileged: true
         container_name: rfsim5g-oai-gnb2
         environment:
@@ -64,7 +64,7 @@ services:
             timeout: 5s
             retries: 5
     oai-gnb3:
-        image: ithermai6gtc/oai-gnb:v1
+        image: ithermai6gtc/oai-gnb-develop:latest
         privileged: true
         container_name: rfsim5g-oai-gnb3
         environment:
@@ -90,7 +90,7 @@ services:
             timeout: 5s
             retries: 5
     oai-nr-ue1:
-        image: ithermai6gtc/oai-nr-ue:v1
+        image: ithermai6gtc/oai-nr-ue-develop:latest
         privileged: true
         container_name: rfsim5g-oai-nr-ue1
         environment:
@@ -106,7 +106,7 @@ services:
             ue_net:
                 ipv4_address: ${UE1_UENET_IP:-192.168.78.8}
         volumes:
-            - ./conf/ue.conf:/oai/ran/config/nr-ue.conf
+            - ./conf/ue1.conf:/oai/ran/config/nr-ue.conf
             - ./conf/channelmod_rfsimu.conf:/oai/ran/config/channelmod_rfsimu.conf
         healthcheck:
             test: /bin/bash -c "pgrep nr-uesoftmodem"
@@ -114,7 +114,7 @@ services:
             timeout: 5s
             retries: 5
     oai-nr-ue2:
-        image: ithermai6gtc/oai-nr-ue:v1
+        image: ithermai6gtc/oai-nr-ue-develop:latest
         privileged: true
         container_name: rfsim5g-oai-nr-ue2
         environment:
@@ -131,7 +131,7 @@ services:
             ue_net:
                 ipv4_address: ${UE2_UENET_IP:-192.168.78.9}
         volumes:
-            - ./conf/ue.conf:/oai/ran/config/nr-ue.conf
+            - ./conf/ue2.conf:/oai/ran/config/nr-ue.conf
             - ./conf/channelmod_rfsimu.conf:/oai/ran/config/channelmod_rfsimu.conf
         healthcheck:
             test: /bin/bash -c "pgrep nr-uesoftmodem"
@@ -139,7 +139,7 @@ services:
             timeout: 5s
             retries: 5
     oai-nr-ue3:
-        image: ithermai6gtc/oai-nr-ue:v1
+        image: ithermai6gtc/oai-nr-ue-develop:latest
         privileged: true
         container_name: rfsim5g-oai-nr-ue3
         environment:
@@ -156,7 +156,7 @@ services:
             ue_net:
                 ipv4_address: ${UE3_UENET_IP:-192.168.78.10}
         volumes:
-            - ./conf/ue.conf:/oai/ran/config/nr-ue.conf
+            - ./conf/ue3.conf:/oai/ran/config/nr-ue.conf
             - ./conf/channelmod_rfsimu.conf:/oai/ran/config/channelmod_rfsimu.conf
         healthcheck:
             test: /bin/bash -c "pgrep nr-uesoftmodem"

@@ -1,0 +1,58 @@
+services:
+  oai-xapp-mysql:
+    image: mysql:8.0
+    container_name: oai-xapp-mysql
+    restart: always
+    networks:
+      ric_net:
+        ipv4_address: 192.168.75.10
+    environment:
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=password
+      - MYSQL_DATABASE=flexric_db
+      - MYSQL_ROOT_PASSWORD=password
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - ./volumes/mysql_data:/var/lib/mysql
+    ports:
+      - 3307:3306
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 30
+      interval: 10s
+
+  oai-xapp-kpm-mon:
+    image: ithermai6gtc/xapp-kpm-mon-3slices:v1
+    container_name: oai-xapp-kpm-mon
+    restart: always
+    env_file:
+      - ./xapp_kpm_mon.env
+    depends_on:
+      oai-xapp-mysql:
+        condition: service_healthy
+    networks:
+      ric_net:
+        ipv4_address: 192.168.75.11
+    volumes:
+      - ./flexric.conf:/usr/local/etc/flexric/flexric.conf
+    healthcheck:
+      test: /bin/bash -c "pgrep xapp_kpm_moni"
+      retries: 5
+      timeout: 5s
+      interval: 10s
+
+networks:
+  public_net:
+      external:
+          name: demo-oai-public-net
+  ric_net:
+      external:
+          name: rfsim5g-oai-ric-net
+  ue_net:
+      external:
+          name: rfsim5g-oai-ue-net
+  public_net_access:
+      external:
+          name: oai-public-access

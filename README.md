@@ -50,6 +50,17 @@ Key functions of this microservice:
 - Stores collected data in a **MongoDB** database.  
 - Exposes metrics to **Prometheus** and visualizes them in **Grafana**.  
 
+### 4. `xapp-kpm-mon`
+This directory contains the **xApp KPM Monitoring** service, which is responsible for continuously collecting and storing network performance metrics.
+
+The included **Docker Compose** file sets up the complete environment required to run the xApp, including all necessary dependencies and configurations. Once deployed, the service performs the following key functions:
+
+- **Collects KPM metrics** related to both **Network** and **UE (User Equipment)** performance.  
+- **Monitors multiple network slices** - typically three - to capture slice-specific KPIs for analysis and optimization.  
+- **Stores all collected metrics** in a **MySQL database** for persistent storage and downstream analytics.  
+
+This setup enables real-time and historical performance monitoring within the O-RAN RIC ecosystem, providing a foundation for KPI analysis, anomaly detection, and network optimization workflows.
+
 #### Notes
 - **Note 1:**  
   Inside `deployments/nwdaf/conf/nbi_events_handler_schemas/`, the file `events_schema.json` defines the structure of the events to extract.  
@@ -146,6 +157,44 @@ sleep 5
 docker compose -f docker-compose-ran.yaml up -d oai-nr-ue3
 ```
 
+### xApp KPM Monitoring
+To launch the **xApp KPM Monitoring** service along with its associated **MySQL database**, simply run:
+```
+cd xapp-kpm-mon/
+docker compose up -d
+```
+This command will start both the monitoring xApp and the MySQL database in detached mode.
+The xApp will begin collecting **KPM (Key Performance Metrics)** from multiple network slices and **storing them persistently** in the MySQL database.
+
+You can view the live logs of the xApp service with:
+```
+docker logs -f oai-xapp-kpm-mon
+```
+The MySQL database is exposed on port `3307`, allowing you to connect using any MySQL client to inspect the stored metrics.
+
+#### Iperf Test
+
+To observe how KPI metrics change in response to varying network traffic, you can generate traffic between different **UEs** and the **Core Network** components.  
+This allows you to monitor real-time KPI variations for specific UEs within the MySQL database.
+
+The example below demonstrates how to perform an **iperf** test between the `oai-ext-dn` service (representing the Core Network’s external data network) and **UE number 1**.
+
+**From the UE side (server):**
+```
+docker exec -it oai-nr-ue1 bash
+iperf -u -s -B 10.0.0.2 -i 1
+```
+This starts `iperf` in **UDP server mode**, binding it to the UE’s IP address (`10.0.0.2`) and displaying per-second performance updates.
+
+**From the `oai-ext-dn` side (client):**
+```
+docker exec -it oai-ext-dn bash
+iperf -u -c 10.0.0.2 -b 100M -t 60 -i 1 -fk
+```
+This command runs `iperf` in **UDP client mode**, sending traffic to the UE at `10.0.0.2` with a bandwidth of **100 Mbps** for **60 seconds**, reporting statistics every second.
+
+After running the test, you can inspect the **KPI variations** in the MySQL database to analyze how the network responded to the generated traffic (e.g., throughput, packet loss, latency metrics).
+
 ## 📊 Output Samples
 
 This section provides example outputs from a complete run of the testbed.  
@@ -165,6 +214,17 @@ This snapshot shows a sample **MongoDB collection** where event subscription dat
 
 <p align="center">
   <img src="./output_samples/sample_2.png">
+</p>
+
+### MySQL Metrics
+
+The image below illustrates the **MySQL database** where all collected **KPM metrics** are stored.  
+In this example, network traffic was generated for **UE number 1**, and the resulting metrics - such as throughput, latency, and packet statistics - were recorded in real time.
+
+These stored metrics provide valuable insights into the **network performance per slice and per UE**, enabling performance analysis, anomaly detection, and system optimization.
+
+<p align="center">
+  <img src="./output_samples/sample_4.png">
 </p>
 
 ### Grafana
