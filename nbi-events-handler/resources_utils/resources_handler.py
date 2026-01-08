@@ -13,10 +13,7 @@ class ResourcesHandler:
 
 		self.docker_client = docker.DockerClient(base_url='unix://var/run/docker.sock')
 
-		self.containers_map = {
-			"gnb1": os.environ.get("GNB1_CN"),
-			"gnb2": os.environ.get("GNB2_CN"),
-			"gnb3": os.environ.get("GNB3_CN")}
+		self.containers_map = {"gnb1": os.environ.get("GNB1_CN")}
 
 	def get_resources_usages(self):
 

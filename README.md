@@ -140,14 +140,14 @@ docker compose up -d
 Once the **Core Network** and **NWDAF** components are fully loaded, start the RAN components in sequence.
 
 #### 1- gNB
-Start the gNB containers:
+Start the gNB container:
 ``` Bash
 cd deployments/slicing
-docker compose -f docker-compose-ran.yaml up -d oai-gnb{1,2,3}
+docker compose -f docker-compose-ran.yaml up -d oai-gnb1
 ```
 
 #### 2- UE
-After the gNB services are running, launch the UEs sequentially (with a delay between each):
+After the gNB service is running, launch the UEs sequentially (with a delay between each):
 ``` Bash
 cd deployments/slicing
 docker compose -f docker-compose-ran.yaml up -d oai-nr-ue1
